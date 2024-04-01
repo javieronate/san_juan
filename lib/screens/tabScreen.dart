@@ -102,16 +102,6 @@ class _TabScreenState extends State<TabScreen> {
             label: 'Reporte',
             backgroundColor: Colors.black87,
           ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.receipt),
-          //   label: 'Recibos',
-          //   backgroundColor: Colors.black87,
-          // ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.sync),
-          //   label: 'Sincronizar',
-          //   backgroundColor: Colors.black87,
-          // ),
         ],
         selectedItemColor: Colors.redAccent,
         unselectedItemColor: Colors.white54,

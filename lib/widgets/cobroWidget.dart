@@ -69,6 +69,18 @@ class CobroWidget extends StatelessWidget {
                           "\$${cobro.montoAbonoAcordado} ",
                           style: Theme.of(context).textTheme.labelMedium,
                         ),
+                        // Text(
+                        //   "Orden: ${cobro.orden}",
+                        //   style: Theme.of(context).textTheme.bodyMedium,
+                        // ),
+                        // Text(
+                        //   "foto ine: ${cobro.fotoIdentificacion}",
+                        //   style: Theme.of(context).textTheme.bodyMedium,
+                        // ),
+                        // Text(
+                        //   "foto fachada: ${cobro.fotoFachada}",
+                        //   style: Theme.of(context).textTheme.bodyMedium,
+                        // ),
                       ],
                     ),
                   ),

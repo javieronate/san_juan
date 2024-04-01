@@ -3,9 +3,11 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:san_juan/models/cobro.dart';
 import 'package:san_juan/screens/recibosScreen.dart';
+import 'package:san_juan/screens/tabScreen.dart';
 import '../repositories/cobrosRepository.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
+import 'dart:math';
 
 final formatter = DateFormat.yMd();
 
@@ -32,22 +34,29 @@ class _RegistroCobroScreenState extends State<RegistroCobroScreen> {
   DateTime? _selectedDate;
 
   void _visitado() {
+    FocusManager.instance.primaryFocus?.unfocus();
     const pago = 0.0;
     grabarPago(pago, 0);
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const TabScreen()),
+        (route) => false);
   }
 
   void _pagado() {
-    final pago = double.parse(_pagoController.text);
+    FocusManager.instance.primaryFocus?.unfocus();
+    final montoPagado = double.parse(_pagoController.text);
+    Random random = new Random();
+    int idRecibo = random.nextInt(10000);
     setState(() {
       cobro.cobrado = 1;
+      cobro.recibo = idRecibo;
     });
-    grabarPago(pago, 1);
+    grabarPago(montoPagado, 1);
   }
 
-  void grabarPago(pago, pagado) {
-    final pagoIndicado = pago;
+  void grabarPago(montoPagado, pagado) {
+    final pagoIndicado = montoPagado;
     final notaIndicada = _notaController.text;
-    //final idCuenta = cobro.idCuenta;
     final siguienteDia = _selectedDate!.day;
     final siguienteMes = _selectedDate!.month;
     final siguienteAno = _selectedDate!.year;
@@ -150,7 +159,7 @@ class _RegistroCobroScreenState extends State<RegistroCobroScreen> {
               height: 30,
             ),
             Text(
-              "\$${cobro.montoAbonoAcordado}",
+              "\$${cobro.montoAbonoAcordado.toStringAsFixed(2)}",
               style: Theme.of(context).textTheme.displayLarge,
             ),
             const Padding(

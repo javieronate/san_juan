@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:san_juan/models/ProntoPago.dart';
 import 'package:san_juan/models/abonoEfectuado.dart';
 import 'package:san_juan/screens/impresionScreen.dart';
+import 'package:san_juan/screens/tabScreen.dart';
 import 'package:san_juan/widgets/prontoPagoWidget.dart';
 
 import '../models/cobro.dart';
@@ -72,17 +73,33 @@ class _RecibosScreenState extends State<RecibosScreen> {
     var formatter = NumberFormat('#,##,##0.00');
     return Scaffold(
       appBar: AppBar(
+        leading: BackButton(
+          onPressed: () => {
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const TabScreen()),
+                (route) => false),
+          },
+        ),
         title: const Text("Recibo de pago"),
       ),
-      body:
-          // agregar Expanded para alinear columnas a ver si funciona
-          // igual debe ponerse despues de Column y antes de children
-          SingleChildScrollView(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
         child: Column(
           children: [
             Text(
               "Recibo de Pago",
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Text(
+              "${cobro.recibo}",
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Text(
+              "Su pago:",
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Text(
+              "\$${cobro.montoCobradoEnVisita}",
               style: Theme.of(context).textTheme.displayLarge,
             ),
             Text(
@@ -272,14 +289,6 @@ class _RecibosScreenState extends State<RecibosScreen> {
                     "No hay pagos registrados",
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-            Text(
-              "Su pago:",
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            Text(
-              "\$${cobro.montoCobradoEnVisita}",
-              style: Theme.of(context).textTheme.displayLarge,
-            ),
             const Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: 40,

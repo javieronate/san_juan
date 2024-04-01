@@ -67,6 +67,7 @@ class _ImpresionScreenState extends State<ImpresionScreen> {
 
   Future<void> _iniciarImpresion(BluetoothDevice device) async {
     if (device != null && device.address != null) {
+      await bluetoothPrint.disconnect();
       await bluetoothPrint.connect(device);
       Map<String, dynamic> config = Map();
       List<LineText> list = [];
@@ -85,7 +86,7 @@ class _ImpresionScreenState extends State<ImpresionScreen> {
       list.add(
         LineText(
           type: LineText.TYPE_TEXT,
-          content: widget.cobro.nombreCliente,
+          content: "hola",
           weight: 0,
           align: LineText.ALIGN_LEFT,
           linefeed: 1,
@@ -94,12 +95,13 @@ class _ImpresionScreenState extends State<ImpresionScreen> {
       list.add(
         LineText(
           type: LineText.TYPE_TEXT,
-          content: widget.cobro.productos,
+          content: "triunfamos",
           weight: 0,
           align: LineText.ALIGN_LEFT,
           linefeed: 1,
         ),
       );
+      await bluetoothPrint.disconnect();
     }
   }
 }

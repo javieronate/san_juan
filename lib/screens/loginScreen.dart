@@ -20,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _logueado = false;
 
   void _validarLogin() async {
+    FocusManager.instance.primaryFocus?.unfocus();
     final usuario = _usuarioAnotado.toString();
     final password = _claveAnotada.toString();
 
@@ -36,7 +37,28 @@ class _LoginScreenState extends State<LoginScreen> {
       await _dataService.addItem(
           "idPersona", _datosUsuario!.idPersona.toString());
       _definirPantalla();
+    } else {
+      ponerAlerta();
     }
+  }
+
+  void ponerAlerta() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Error'),
+        content: const Text(
+            'Los datos indicados no son válidos. Por favor vuelva a intentarlo'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+            },
+            child: const Text('Regresar'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _definirPantalla() {
@@ -98,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               Image.asset(
                 'assets/images/LSJ.png',
-                height: 100,
+                height: 80,
               ),
               const SizedBox(
                 height: 25,

@@ -5,6 +5,7 @@ import 'package:san_juan/screens/resultadosBusquedaScreen.dart';
 
 import '../models/cobro.dart';
 import '../repositories/cobrosRepository.dart';
+import '../services/cobrosServices.dart';
 import '../widgets/cobroWidget.dart';
 import '../widgets/pagoWidget.dart';
 import '../widgets/resultadoBusquedaWidget.dart';
@@ -30,21 +31,49 @@ class _BuscarScreenState extends State<BuscarScreen> {
   final _direccionController = TextEditingController();
   final _cuentaController = TextEditingController();
 
+  void _buscarEnServidor() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final nombreIndicado = _nombreController.text;
+    final direccionIndicada = _direccionController.text;
+    final cuentaIndicada = _cuentaController.text;
+    setState(() {
+      _listaBusqueda = [];
+      _resutladosVacios = true;
+    });
+    if (nombreIndicado.isNotEmpty || cuentaIndicada.isNotEmpty) {
+      final listaServidor = await CobrosServices().buscarCobrosServidor(
+          nombreIndicado, direccionIndicada, cuentaIndicada);
+      if (listaServidor != null && listaServidor!.isNotEmpty) {
+        setState(() {
+          _listaBusqueda = listaServidor;
+          _resutladosVacios = false;
+        });
+      }
+    }
+  }
+
   void _buscar() async {
+    FocusManager.instance.primaryFocus?.unfocus();
     final nombreIndicado = _nombreController.text;
     final direccionIndicada = _direccionController.text;
     final cuentaIndicada = _cuentaController.text;
 
-    // todo: validar datos correctos
-    final repositorio = CobrosRepository();
-    _listaBusqueda = (await repositorio.buscarCobros(
-        nombreIndicado, direccionIndicada, cuentaIndicada));
+    setState(() {
+      _listaBusqueda = [];
+      _resutladosVacios = true;
+    });
 
-    if (_listaBusqueda != null && _listaBusqueda!.isNotEmpty) {
-      setState(() {
-        _resutladosVacios = false;
-      });
-      //_relacionEncontrados();
+    if (nombreIndicado.isNotEmpty ||
+        direccionIndicada.isNotEmpty ||
+        cuentaIndicada.isNotEmpty) {
+      final repositorio = CobrosRepository();
+      _listaBusqueda = (await repositorio.buscarCobros(
+          nombreIndicado, direccionIndicada, cuentaIndicada));
+      if (_listaBusqueda != null && _listaBusqueda!.isNotEmpty) {
+        setState(() {
+          _resutladosVacios = false;
+        });
+      }
     }
   }
 
@@ -83,9 +112,9 @@ class _BuscarScreenState extends State<BuscarScreen> {
     final ancho = MediaQuery.of(context).size.width;
     final keyboardSpace = MediaQuery.of(context).viewInsets.bottom;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Buscar clientes"),
-      ),
+      // appBar: AppBar(
+      //   title: const Text("Buscar clientes"),
+      // ),
       body: Container(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
         child: Column(
@@ -96,19 +125,26 @@ class _BuscarScreenState extends State<BuscarScreen> {
             ),
             const SizedBox(height: 3),
             TextField(
-              decoration: const InputDecoration(labelText: 'Dirección'),
-              controller: _direccionController,
+              decoration: const InputDecoration(labelText: 'Cuenta'),
+              controller: _cuentaController,
             ),
             const SizedBox(height: 3),
             TextField(
-              decoration: const InputDecoration(labelText: 'Cuenta'),
-              controller: _cuentaController,
+              decoration: const InputDecoration(
+                  labelText: 'Dirección (sólo busqueda local)'),
+              controller: _direccionController,
             ),
             const SizedBox(height: 3),
             ElevatedButton.icon(
               onPressed: _buscar,
               icon: const Icon(Icons.find_in_page),
               label: const Text('Buscar'),
+            ),
+            const SizedBox(height: 3),
+            ElevatedButton.icon(
+              onPressed: _buscarEnServidor,
+              icon: const Icon(Icons.download_outlined),
+              label: const Text('Buscar en servidor'),
             ),
             const Divider(
               color: Colors.grey,
@@ -132,34 +168,6 @@ class _BuscarScreenState extends State<BuscarScreen> {
           ],
         ),
       ),
-
-      // SingleChildScrollView(
-      //   padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-      //   child: Column(
-      //     children: [
-      //       TextField(
-      //         decoration: const InputDecoration(labelText: 'Cliente'),
-      //         controller: _nombreController,
-      //       ),
-      //       const SizedBox(height: 3),
-      //       TextField(
-      //         decoration: const InputDecoration(labelText: 'Dirección'),
-      //         controller: _direccionController,
-      //       ),
-      //       const SizedBox(height: 3),
-      //       TextField(
-      //         decoration: const InputDecoration(labelText: 'Cuenta'),
-      //         controller: _cuentaController,
-      //       ),
-      //       const SizedBox(height: 3),
-      //       ElevatedButton.icon(
-      //         onPressed: _buscar,
-      //         icon: const Icon(Icons.find_in_page),
-      //         label: const Text('Buscar'),
-      //       ),
-      //     ],
-      //   ),
-      // ),
     );
   }
 }

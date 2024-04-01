@@ -11,14 +11,10 @@ Future<Database> _getDatabase() async {
     path.join(dbPath, 'cobros.db'),
     onCreate: (db, version) async {
       print("borrando tablas");
-      await db.execute("DROP TABLE IF EXISTS estatus");
       await db.execute("DROP TABLE IF EXISTS cobros");
       print("creando tablas");
       await db.execute(
-          'CREATE TABLE estatus(id INT PRIMARY KEY,usuario TEXT, cargado INT)');
-      await db.insert('estatus', {'id': 1, 'usuario': '', 'cargado': 0});
-      await db.execute(
-          'CREATE TABLE cobros(idCuenta  INT PRIMARY KEY,idCobrador INT,idContrato INT,idCliente INT,claveCuenta TEXT,fechaVenta TEXT,idTipoPago INT,diaPago TEXT,diaPagoA INT,diaPagoB INT,fechaProximoPago TEXT,idPersona INT,nombreCliente TEXT,idDireccion INT,calle TEXT,noExt TEXT,noInt TEXT,colonia TEXT,delegacion TEXT,municipio TEXT,referencias TEXT,cp TEXT,orden INT,cobrado INT,subido INT,fotoIdentificacion TEXT,fotoFachada TEXT,montoCobradoEnVisita REAL,fechaSiguientePago TEXT,nota TEXT,visitado INT,montoTotal REAL,montoAbonoAcordado REAL,fechaPrimerPago TEXT,fechaTerminacionCredito TEXT,saldo REAL,porcentajePagado TEXT,pagosAtrasados INT,saldoAtrasado INT,productos TEXT,prontoPago TEXT,relacionPagos TEXT)');
+          'CREATE TABLE cobros(idCuenta  INT PRIMARY KEY,idCobrador INT,idContrato INT,idCliente INT,claveCuenta TEXT,fechaVenta TEXT,idTipoPago INT,diaPago TEXT,diaPagoA INT,diaPagoB INT,fechaProximoPago TEXT,idPersona INT,nombreCliente TEXT,idDireccion INT,calle TEXT,noExt TEXT,noInt TEXT,colonia TEXT,delegacion TEXT,municipio TEXT,referencias TEXT,cp TEXT,orden INT,cobrado INT,subido INT,recibo INT,fotoIdentificacion TEXT,fotoFachada TEXT,montoCobradoEnVisita REAL,fechaSiguientePago TEXT,nota TEXT,visitado INT,montoTotal REAL,montoAbonoAcordado REAL,fechaPrimerPago TEXT,fechaTerminacionCredito TEXT,saldo REAL,porcentajePagado TEXT,pagosAtrasados INT,saldoAtrasado INT,productos TEXT,prontoPago TEXT,relacionPagos TEXT)');
       print("terminado de inicializacion de base de datos");
       //return true;
     },
@@ -220,6 +216,7 @@ Future<Database> _inicializarTablas() async {
       'orden INT, '
       'cobrado INT,'
       'subido INT, '
+      'recibo INT, '
       'fotoIdentificacion TEXT,'
       'fotoFachada TEXT,'
       'montoPagado INT,'
@@ -312,6 +309,7 @@ class CobrosRepository {
         'orden': cobro.orden,
         'cobrado': cobro.cobrado,
         'subido': cobro.subido,
+        'recibo': cobro.recibo,
         'fotoIdentificacion': cobro.fotoIdentificacion,
         'fotoFachada': cobro.fotoFachada,
         'montoCobradoEnVisita': cobro.montoCobradoEnVisita,
@@ -337,7 +335,8 @@ class CobrosRepository {
 
   Future<List<Cobro>> leerCobros() async {
     final db = await _getDatabase();
-    final data = await db.query('cobros', where: 'visitado=0');
+    final data =
+        await db.query('cobros', where: 'visitado=0', orderBy: 'orden');
     final cobros = data
         .map(
           (row) => Cobro(
@@ -366,6 +365,7 @@ class CobrosRepository {
             orden: row['orden'] as int,
             cobrado: row['cobrado'] as int,
             subido: row['subido'] as int,
+            recibo: row['recibo'] as int,
             fotoIdentificacion: row['fotoIdentificacion'] as String,
             fotoFachada: row['fotoFachada'] as String,
             montoCobradoEnVisita: row['montoCobradoEnVisita'] as double,
@@ -396,11 +396,15 @@ class CobrosRepository {
         'montoCobradoEnVisita = ?, '
         'fechaSiguientePago = ?,'
         'nota = ?,'
+        'recibo = ?,'
+        'orden = ?,'
         'visitado = ? WHERE idCuenta = ${cobro.idCuenta}',
         [
           cobro.montoCobradoEnVisita,
           cobro.fechaSiguientePago,
           cobro.nota,
+          cobro.recibo,
+          cobro.orden,
           cobro.visitado
         ]);
   }
@@ -486,6 +490,7 @@ class CobrosRepository {
               orden: row['orden'] as int,
               cobrado: row['cobrado'] as int,
               subido: row['subido'] as int,
+              recibo: row['recibo'] as int,
               fotoIdentificacion: row['fotoIdentificacion'] as String,
               fotoFachada: row['fotoFachada'] as String,
               montoCobradoEnVisita: row['montoCobradoEnVisita'] as double,
@@ -521,11 +526,9 @@ class CobrosRepository {
   }
 
   Future<List<Cobro>> buscarCobros(nombre, direccion, cuenta) async {
-    //Future<List<Cobro>?> cobros;
-
     String? textoWhere;
     String conector = ' or ';
-
+    //if (nombre != "" || cuenta != ""  || direccion != ""){
     final arreglo = [];
     if (nombre != "") {
       textoWhere = ' nombreCliente like ? ';
@@ -591,6 +594,7 @@ class CobrosRepository {
             orden: row['orden'] as int,
             cobrado: row['cobrado'] as int,
             subido: row['subido'] as int,
+            recibo: row['recibo'] as int,
             fotoIdentificacion: row['fotoIdentificacion'] as String,
             fotoFachada: row['fotoFachada'] as String,
             montoCobradoEnVisita: row['montoCobradoEnVisita'] as double,
@@ -611,7 +615,24 @@ class CobrosRepository {
           ),
         )
         .toList();
-    //}
     return cobros;
+  }
+
+  // reordenar
+  Future<int> reordenar(renglon) async {
+    final db = await _getDatabase();
+    //for (final renglon in listaNuevoOrden) {
+    print(renglon.cliente);
+    print(renglon.idCuenta);
+    print('de:');
+    print(renglon.ordenInicial);
+    print('a:');
+    print(renglon.ordenFinal);
+
+    final resultado = await db.rawUpdate(
+        'UPDATE cobros SET '
+        'orden = ? WHERE idCuenta = ${renglon.idCuenta}',
+        [renglon.ordenFinal]);
+    return (resultado);
   }
 }

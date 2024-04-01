@@ -36,6 +36,7 @@ class Cobro {
   int orden;
   int cobrado;
   int subido;
+  int recibo;
   String fotoIdentificacion;
   String fotoFachada;
   double montoCobradoEnVisita;
@@ -80,6 +81,7 @@ class Cobro {
     required this.orden,
     required this.cobrado,
     required this.subido,
+    required this.recibo,
     required this.fotoIdentificacion,
     required this.fotoFachada,
     required this.montoCobradoEnVisita,
@@ -125,6 +127,7 @@ class Cobro {
         orden: json["orden"],
         cobrado: json["cobrado"],
         subido: json["subido"],
+        recibo: json["recibo"],
         fotoIdentificacion: json["fotoIdentificacion"],
         fotoFachada: json["fotoFachada"],
         montoCobradoEnVisita: json["montoCobradoEnVisita"].toDouble(),
@@ -170,6 +173,7 @@ class Cobro {
         "orden": orden,
         "cobrado": cobrado,
         "subido": subido,
+        "recibo": recibo,
         "fotoIdentificacion": fotoIdentificacion,
         "fotoFachada": fotoFachada,
         "montoCobradoEnVisita": montoCobradoEnVisita,

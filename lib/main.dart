@@ -3,7 +3,13 @@ import 'package:san_juan/screens/loginScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const MyApp(
+      // routes: {
+      //   'inicio':(context) => TabScreen()
+      // },
+      //
+      //
+      ));
 }
 
 class MyApp extends StatelessWidget {
